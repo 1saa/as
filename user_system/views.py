@@ -1,7 +1,7 @@
 from django.shortcuts import render
-from django.http import JsonResponse 
+from django.http import HttpResponse, JsonResponse 
 from django.views.decorators.csrf import csrf_exempt
-from django.views.decorators.http import require_GET, require_POST
+from django.views.decorators.http import require_GET, require_http_methods
 import json
 from functools import wraps
 from .models import User, Papers, Discussion, Dis_center
@@ -13,25 +13,35 @@ def experiment(request):
 
 
 @csrf_exempt
-@require_POST
+@require_http_methods(['POST', 'OPTIONS'])
 def register(request):
 
+    if (request.method == 'OPTIONS'):
+      response_options()
+    
     register_info = json.loads(request.body)
     name = register_info['username']
     password = register_info['password']
         
     if User.objects.filter(username=name).exists():
-        return JsonResponse({'code': 1, 'msg': 'The username has been used'})
+        response = JsonResponse({'code': 1, 'msg': 'The username has been used'})
+        response['Access-Control-Allow-Origin'] = 'http://localhost:3000'
+        return response
     else:
         new_account = User()
         new_account.username = name
         new_account.password_hash = password
         new_account.save()
-        return JsonResponse({'code': 0, 'msg': 'success'})
+        response = JsonResponse({'code': 0, 'msg': 'success'})
+        response['Access-Control-Allow-Origin'] = 'http://localhost:3000'
+        return response
 
 @csrf_exempt
-@require_POST
+@require_http_methods(['POST', 'OPTIONS'])
 def login(request):
+
+    if (request.method == 'OPTIONS'):
+      response_options()
 
     login_info = json.loads(request.body)
     name = login_info['username']
@@ -42,11 +52,17 @@ def login(request):
         if user_check.password_hash == password:
             request.session['is_login'] = '1'
             request.session['name'] = name
-            return JsonResponse({'code': 0, 'msg': 'success'})
+            response = JsonResponse({'code': 0, 'msg': 'success'})
+            response['Access-Control-Allow-Origin'] = 'http://localhost:3000'
+            return response
         else:
-            return JsonResponse({'code': 1, 'msg': 'The password is wrong'})
+            response = JsonResponse({'code': 1, 'msg': 'The password is wrong'})
+            response['Access-Control-Allow-Origin'] = 'http://localhost:3000'
+            return response
     else:
-        return JsonResponse({'code': 1, 'msg': 'The username does not exist'})
+        response = JsonResponse({'code': 1, 'msg': 'The username does not exist'})
+        response['Access-Control-Allow-Origin'] = 'http://localhost:3000'
+        return response
 
 def check_login(func):
     @wraps(func)
@@ -87,3 +103,10 @@ def get_user_detail(request):
             'follow': 'This is private',
             'like': 'This is private',
         })
+
+def response_options():
+  response = HttpResponse()
+  response['Access-Control-Allow-Origin'] = 'http://localhost:3000'
+  response['Access-Control-Allow-Methods'] = 'POST'
+  response['Access-Control-Allow-Headers'] = 'Content-Type'
+  return response
