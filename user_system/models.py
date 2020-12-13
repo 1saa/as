@@ -66,17 +66,17 @@ class Discussion(models.Model):
 
     creater         = models.CharField(max_length=16, db_index=True)
     title           = models.CharField(max_length=128, db_index=True)
-    information     = models.TextField()
+    information     = models.TextField(default="I wanna say something")
     tag_list        = models.JSONField(default=list)
     recommend       = models.IntegerField(default=0)
-    reply           = models.TextField(default='There is no reply')
+    reply           = models.JSONField(default=list)
     reply_number    = models.IntegerField(default=0)
     create_time     = models.DateField(auto_now_add=True)
     last_reply      = models.CharField(max_length=512, null=True)
     last_name       = models.CharField(max_length=16, null=True)
     last_time       = models.DateTimeField(null=True)
 
-class Dis_center(models.Model):
+class DisCenter(models.Model):
 
     tag_title   = models.CharField(max_length=128, db_index=True)
     number      = models.IntegerField(default=1)
