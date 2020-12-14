@@ -8,4 +8,6 @@ urlpatterns = [
     path('reply', views.reply),
     path('reco_up', views.reco_up),
     path('reco_down', views.reco_down),
+    path('create_center', views.create_center),
+    path('get_center', views.get_center),
 ]

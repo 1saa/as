@@ -50,6 +50,12 @@ def add_tag(request):
     add_info = json.loads(request.body)
     tag = add_info['tag']
     cur_dis = Discussion.objects.get(id=add_info['id'])
+    if tag not in cur_dis.tag_list:
+        dis_centers = DisCenter.objects.filter(tag_tittle=tag)
+        if dis_centers.exists():
+            dis_center = dis_centers[0]
+            dis_center.number += 1
+            dis_center.save()
     cur_dis.add_tag(tag)
     return JsonResponse({
         'code': 0,
@@ -63,6 +69,12 @@ def delete_tag(request):
     delete_info = json.loads(request.body)
     tag = delete_info['tag']
     cur_dis = Discussion.objects.get(id=delete_info['id'])
+    if tag in cur_dis.tag_list:
+        dis_centers = DisCenter.objects.filter(tag_tittle=tag)
+        if dis_centers.exists():
+            dis_center = dis_centers[0]
+            dis_center.number -= 1
+            dis_center.save()
     cur_dis.delete_tag(tag)
     return JsonResponse({
         'code': 0,
@@ -125,4 +137,40 @@ def reco_down(request):
         return JsonResponse({
             'code': 1,
             'msg': 'you have not recommended yet'
+        })
+
+@csrf_exempt
+@require_POST
+@check_login
+def create_center(request):
+    info = json.loads(request.body)
+    tag = info['tag']
+    new_dc = DisCenter()
+    new_dc.tag_tittle = tag
+    count = 0
+    for dis in Discussion.objects.all():
+        if tag in dis.tag_list:
+            count += 1
+    new_dc.number = count
+    new_dc.save()
+    return JsonResponse({
+        'code': 0,
+        'msg': 'set successfully'
+    })
+
+@csrf_exempt
+@require_GET
+def get_center(request):
+    info = json.loads(request.body)
+    tag = info['tag']
+    dis_centers = DisCenter.objects.filter(tag_tittle=tag)
+    if dis_centers.exists():
+        dis_center = dis_centers[0]
+        return JsonResponse({
+            'number': dis_center.number
+        })
+    else:
+        return JsonResponse({
+            'code': 1,
+            'msg': 'There is no such discuss center'
         })

@@ -66,7 +66,7 @@ class Papers(models.Model):
 class Discussion(models.Model):
 
     creator         = models.CharField(max_length=16, db_index=True)
-    tittle           = models.CharField(max_length=128, db_index=True)
+    tittle          = models.CharField(max_length=128, db_index=True)
     information     = models.TextField(default="I wanna say something")
     tag_list        = models.JSONField(default=list)
     recommend       = models.IntegerField(default=0)
@@ -101,5 +101,5 @@ class Discussion(models.Model):
 
 class DisCenter(models.Model):
 
-    tag_title   = models.CharField(max_length=128, db_index=True)
-    number      = models.IntegerField(default=1)
+    tag_tittle  = models.CharField(max_length=128, unique=True, db_index=True)
+    number      = models.IntegerField(default=0)
