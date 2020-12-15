@@ -13,6 +13,6 @@ class Migration(migrations.Migration):
         migrations.RenameField(
             model_name='discussion',
             old_name='title',
-            new_name='tittle',
+            new_name='title',
         ),
     ]

@@ -58,23 +58,9 @@ class Papers(models.Model):
     name            = models.CharField(max_length=128, db_index=True)
     information     = models.TextField(default="Please edit by yourselves")
     authors         = models.JSONField(default=list)
-    file            = models.FileField(upload_to='paper_file/')
+    file            = models.URLField(default='/media/file/LFS.pdf')
     tag_list        = models.JSONField(default=list)
     create_time     = models.DateField(auto_now_add=True)
-    last_edit_time  = models.DateTimeField(null=True)
-
-class Discussion(models.Model):
-
-    creator         = models.CharField(max_length=16, db_index=True)
-    tittle          = models.CharField(max_length=128, db_index=True)
-    information     = models.TextField(default="I wanna say something")
-    tag_list        = models.JSONField(default=list)
-    recommend       = models.IntegerField(default=0)
-    reco_list       = models.JSONField(default=list)
-    reply           = models.JSONField(default=list)
-    reply_number    = models.IntegerField(default=0)
-    create_time     = models.DateField(auto_now_add=True)
-    last_reply      = models.CharField(max_length=512, null=True)
     last_name       = models.CharField(max_length=16, null=True)
     last_time       = models.DateTimeField(null=True)
 
@@ -88,18 +74,45 @@ class Discussion(models.Model):
             self.tag_list.remove(tag)
             self.save()
 
-    def add_reply(self, reply_to, reply_text, name):
-        text = reply_text
-        if reply_to > 0:
-            text = "<rep to " + str(reply_to) + "> " + text
-        self.reply_number += 1
-        self.reply.append(text)
-        self.last_reply = text
+    def edit_info(self, text, name):
+        self.information = text
         self.last_name = name
         self.last_time = timezone.now()
         self.save()
 
+class Discussion(models.Model):
+
+    creator         = models.CharField(max_length=16, db_index=True)
+    title           = models.CharField(max_length=128, db_index=True)
+    information     = models.TextField(default="I wanna say something")
+    tag_list        = models.JSONField(default=list)
+    recommend       = models.IntegerField(default=0)
+    reco_list       = models.JSONField(default=list)
+    reply           = models.JSONField(default=list)
+    reply_number    = models.IntegerField(default=0)
+    create_time     = models.DateField(auto_now_add=True)
+    last            = models.JSONField(default=dict)
+
+    def add_tag(self, tag):
+        if tag not in self.tag_list:
+            self.tag_list.append(tag)
+            self.save()
+
+    def delete_tag(self, tag):
+        if tag in self.tag_list:
+            self.tag_list.remove(tag)
+            self.save()
+
+    def add_reply(self, to, text, name):
+        self.reply_number += 1
+        self.last['to'] = to
+        self.last['text'] = text
+        self.last['name'] = name
+        self.last['time'] = timezone.now().strftime("%Y-%m-%d, %H:%M:%S")
+        self.reply.append(self.last)
+        self.save()
+
 class DisCenter(models.Model):
 
-    tag_tittle  = models.CharField(max_length=128, unique=True, db_index=True)
+    tag_title   = models.CharField(max_length=128, unique=True, db_index=True)
     number      = models.IntegerField(default=0)
