@@ -17,11 +17,12 @@ def create_discussion(request):
     new_dis = Discussion()
     new_dis.creator = name
     new_dis.title = title
-    new_dis.information = info
+    new_dis.add_reply(-1, info, name)
     new_dis.save()
     return cors_Jsresponse({
         'code': 0,
-        'msg': 'set successfully'
+        'msg': 'create successfully',
+        'id': new_dis.id,
     })
 
 @csrf_exempt
@@ -33,10 +34,8 @@ def get_discussion(request):
         'id': cur_dis.id,
         'creator': cur_dis.creator,
         'title': cur_dis.title,
-        'text': cur_dis.information,
         'time': cur_dis.create_time,
         'tags': cur_dis.tag_list,
-        'reco': cur_dis.recommend,
         'repy_n': cur_dis.reply_number,
         'reply': cur_dis.reply,
         'last': cur_dis.last,
@@ -47,15 +46,16 @@ def get_discussion(request):
 @check_login
 def add_tag(request):
     add_info = json.loads(request.body)
-    tag = add_info['tag']
+    addlist = add_info['tag']
     cur_dis = Discussion.objects.get(id=add_info['id'])
-    if tag not in cur_dis.tag_list:
-        dis_centers = DisCenter.objects.filter(tag_title=tag)
-        if dis_centers.exists():
-            dis_center = dis_centers[0]
-            dis_center.number += 1
-            dis_center.save()
-    cur_dis.add_tag(tag)
+    for tag in addlist:
+        if tag not in cur_dis.tag_list:
+            dis_centers = DisCenter.objects.filter(tag_title=tag)
+            if dis_centers.exists():
+                dis_center = dis_centers[0]
+                dis_center.number += 1
+                dis_center.save()
+        cur_dis.add_tag(tag)
     return cors_Jsresponse({
         'code': 0,
         'msg': 'set successfully'
@@ -93,7 +93,7 @@ def reply(request):
     cur_dis.add_reply(reply_to, reply_text, reply_name)
     return cors_Jsresponse({
         'code': 0,
-        'msg': 'set successfully'
+        'msg': 'reply successfully'
     })
 
 @csrf_exempt
@@ -102,15 +102,16 @@ def reply(request):
 def reco_up(request):
     name = request.session['name']
     info = json.loads(request.body)
+    numb = info['number']
     cur_dis = Discussion.objects.get(id=info['id'])
-    if name in cur_dis.reco_list:
+    if name in cur_dis.reply[numb]["recolist"]:
         return cors_Jsresponse({
             'code': 1,
             'msg': 'you have recommended before'
         })
     else:
-        cur_dis.recommend += 1
-        cur_dis.reco_list.append(name)
+        cur_dis.reply[numb]["reconumb"] += 1
+        cur_dis.reply[numb]["recolist"].append(name)
         cur_dis.save()
         return cors_Jsresponse({
             'code': 0,
@@ -123,10 +124,11 @@ def reco_up(request):
 def reco_down(request):
     name = request.session['name']
     info = json.loads(request.body)
+    numb = info['number']
     cur_dis = Discussion.objects.get(id=info['id'])
-    if name in cur_dis.reco_list:
-        cur_dis.recommend -= 1
-        cur_dis.reco_list.remove(name)
+    if name in cur_dis.reply[numb]["recolist"]:
+        cur_dis.reply[numb]["reconumb"] -= 1
+        cur_dis.reply[numb]["recolist"].remove(name)
         cur_dis.save()
         return cors_Jsresponse({
             'code': 0,
@@ -154,7 +156,7 @@ def create_center(request):
     new_dc.save()
     return cors_Jsresponse({
         'code': 0,
-        'msg': 'set successfully'
+        'msg': 'create a center successfully'
     })
 
 @csrf_exempt
@@ -173,3 +175,22 @@ def get_center(request):
             'code': 1,
             'msg': 'There is no such discuss center'
         })
+
+@csrf_exempt
+@require_GET
+def get_related_dis(request):
+    info = json.loads(request.body)
+    tag = info['tag']
+    dislist = []
+    for dis in Discussion.objects.all().order_by('-last.time'):
+        if tag in dis.tag_list:
+            udic = {}
+            udic['id'] = dis.id
+            udic['creator'] = dis.creator
+            udic['title'] = dis.title
+            udic['creatTime'] = dis.create_time
+            udic['replyNumber'] = dis.reply_number
+            dislist.append(udic)
+    return cors_Jsresponse({
+        'list': dislist
+    })

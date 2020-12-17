@@ -84,10 +84,7 @@ class Discussion(models.Model):
 
     creator         = models.CharField(max_length=16, db_index=True)
     title           = models.CharField(max_length=128, db_index=True)
-    information     = models.TextField(default="I wanna say something")
     tag_list        = models.JSONField(default=list)
-    recommend       = models.IntegerField(default=0)
-    reco_list       = models.JSONField(default=list)
     reply           = models.JSONField(default=list)
     reply_number    = models.IntegerField(default=0)
     create_time     = models.DateField(auto_now_add=True)
@@ -109,10 +106,12 @@ class Discussion(models.Model):
         self.last['text'] = text
         self.last['name'] = name
         self.last['time'] = timezone.now().strftime("%Y-%m-%d, %H:%M:%S")
+        self.last['reconumb'] = 0
+        self.last['recolist'] = [] 
         self.reply.append(self.last)
         self.save()
 
 class DisCenter(models.Model):
 
-    tag_title   = models.CharField(max_length=128, unique=True, db_index=True)
+    tag_title   = models.CharField(max_length=128, unique=True, db_index=True, default="")
     number      = models.IntegerField(default=0)
