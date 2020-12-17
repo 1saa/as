@@ -38,9 +38,13 @@ def search_papers(request):
             else:
                 paperset = paperset.order_by('-create_time')
             retlist = list(paperset)
-            return JsonResponse({'ret': 0,'retlist': retlist})
+            response = JsonResponse({'ret': 0,'retlist': retlist})
+            response['Access-Control-Allow-Origin'] = 'http://localhost:3000'
+            return response
         else:
-            return JsonResponse({'ret': 1, 'msg': '找不到此类型论文'})
+            response = JsonResponse({'ret': 1, 'msg': '找不到此类型论文'})
+            response['Access-Control-Allow-Origin'] = 'http://localhost:3000'
+            return response
 
 @csrf_exempt
 @require_http_methods(['GET','OPTIONS'])
@@ -62,9 +66,13 @@ def search_discussions(request):
             else:
                 discussionset = discussionset.order_by('-reply_number')
             retlist = list(discussionset)
-            return JsonResponse({'ret': 0, 'retlist': retlist})
+            response =  JsonResponse({'ret': 0, 'retlist': retlist})
+            response['Access-Control-Allow-Origin'] = 'http://localhost:3000'
+            return response
         else:
-            return JsonResponse({'ret': 1, 'msg': '找不到此类型讨论'})
+            response =  JsonResponse({'ret': 1, 'msg': '找不到此类型讨论'})
+            response['Access-Control-Allow-Origin'] = 'http://localhost:3000'
+            return response
 
 def response_options():
   response = HttpResponse()
