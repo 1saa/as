@@ -115,3 +115,4 @@ class DisCenter(models.Model):
 
     tag_title   = models.CharField(max_length=128, unique=True, db_index=True, default="")
     number      = models.IntegerField(default=0)
+    dis_list    = models.JSONField(default=list)
