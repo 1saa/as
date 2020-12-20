@@ -130,7 +130,6 @@ def get_my_information(request):
 @csrf_exempt
 @require_GET
 def get_others_information(request):
-    get_info = json.loads(request.body)
     name = request.GET['username']
     if not User.objects.filter(username=name).exists():
         return cors_Jsresponse({'code': 1, 'msg': 'The user does not exist'})
@@ -177,7 +176,6 @@ def set_my_information(request):
 @csrf_exempt
 @require_GET
 def get_history(request):
-    get_info = json.loads(request.body)
     name = request.GET['username']
     if not User.objects.filter(username=name).exists():
         return cors_Jsresponse({'code': 1, 'msg': 'The user does not exist'})

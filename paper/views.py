@@ -13,28 +13,34 @@ def create_paper(request):
     author_name = request.session['name']
     info = json.loads(request.body)
     paper_name = info['name']
+    paper_puby = info['year']
+    paper_pubr = info['author']
     paper_info = info['information']
     new_paper = Papers()
     new_paper.name = paper_name
+    new_paper.pubyear = paper_puby
+    new_paper.publisher = paper_pubr
     new_paper.information = paper_info
-    new_paper.authors = [paper_name]
+    new_paper.admins = [author_name]
     new_paper.save()
     return cors_Jsresponse({
         'code': 0,
-        'msg': 'create successfully'
+        'msg': 'Create paper successfully.',
+        'id': new_paper.id
     })
 
 @csrf_exempt
 @require_GET
 def get_paper(request):
-    info = json.loads(request.body)
-    pid = info['id']
+    pid = request.GET['id']
     cur_paper = Papers.objects.get(id=pid)
     return cors_Jsresponse({
         'id': cur_paper.id,
         'name': cur_paper.name,
+        'year': cur_paper.pubyear,
+        'author': cur_paper.publisher,
         'info': cur_paper.information,
-        'authors': cur_paper.authors,
+        'admins': cur_paper.admins,
         'file': cur_paper.file,
         'tag': cur_paper.tag_list,
         'time': cur_paper.create_time,
@@ -80,4 +86,12 @@ def delete_tag(request):
     return cors_Jsresponse({
         'code': 0,
         'msg': 'set successfully'
+    })
+
+@csrf_exempt
+@require_GET
+def get_all_paper(request):
+    paper_lsit = Papers.objects.values('id', 'name')
+    return cors_Jsresponse({
+        'paperlist': list(paper_lsit)
     })

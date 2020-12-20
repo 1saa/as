@@ -21,28 +21,31 @@ def create_discussion(request):
     set_info = json.loads(request.body)
     title = set_info['title']
     info = set_info['text']
+    plist = set_info['paperlist']
     new_dis = Discussion()
     new_dis.creator = name
     new_dis.title = title
     new_dis.add_reply(-1, info, name)
+    new_dis.paper_list = plist
     new_dis.save()
     return cors_Jsresponse({
         'code': 0,
-        'msg': 'create successfully',
-        'id': new_dis.id,
+        'msg': 'Create discussion successfully.',
+        'id': new_dis.id
     })
 
 @csrf_exempt
 @require_GET
 def get_discussion(request):
-    get_info = json.loads(request.body)
-    cur_dis = Discussion.objects.get(id=get_info['id'])
+    did = request.GET['id']
+    cur_dis = Discussion.objects.get(id=did)
     return cors_Jsresponse({
         'id': cur_dis.id,
         'creator': cur_dis.creator,
         'title': cur_dis.title,
         'time': cur_dis.create_time,
         'tags': cur_dis.tag_list,
+        'papers': cur_dis.paper_list,
         'repy_n': cur_dis.reply_number,
         'reply': cur_dis.reply,
         'last': cur_dis.last,
@@ -70,7 +73,7 @@ def add_tag(request):
         cur_dis.add_tag(tag)
     return cors_Jsresponse({
         'code': 0,
-        'msg': 'set successfully'
+        'msg': 'Add tags successfully.'
     })
 
 @csrf_exempt
@@ -93,7 +96,7 @@ def delete_tag(request):
     cur_dis.delete_tag(tag)
     return cors_Jsresponse({
         'code': 0,
-        'msg': 'set successfully'
+        'msg': 'Delete tag successfully.'
     })
 
 #reply具有两个参数，一个为整数是回复对象，0为初始讨论信息，另一个为回复字符串
@@ -109,7 +112,7 @@ def reply(request):
     cur_dis.add_reply(reply_to, reply_text, reply_name)
     return cors_Jsresponse({
         'code': 0,
-        'msg': 'reply successfully'
+        'msg': 'Reply successfully.'
     })
 
 @csrf_exempt
@@ -123,7 +126,7 @@ def reco_up(request):
     if name in cur_dis.reply[numb]["recolist"]:
         return cors_Jsresponse({
             'code': 1,
-            'msg': 'you have recommended before'
+            'msg': 'You have recommended before.'
         })
     else:
         cur_dis.reply[numb]["reconumb"] += 1
@@ -131,7 +134,7 @@ def reco_up(request):
         cur_dis.save()
         return cors_Jsresponse({
             'code': 0,
-            'msg': 'recommend successfully'
+            'msg': 'Recommend successfully.'
         })
 
 @csrf_exempt
@@ -148,19 +151,18 @@ def reco_down(request):
         cur_dis.save()
         return cors_Jsresponse({
             'code': 0,
-            'msg': 'derecommend successfully'
+            'msg': 'Derecommend successfully.'
         })
     else:
         return cors_Jsresponse({
             'code': 1,
-            'msg': 'you have not recommended yet'
+            'msg': 'You have not recommended yet.'
         })
 
 @csrf_exempt
 @require_GET
 def get_center(request):
-    info = json.loads(request.body)
-    tag = info['tag']
+    tag = request.GET['tag']
     dis_centers = DisCenter.objects.filter(tag_title=tag)
     if dis_centers.exists():
         dis_center = dis_centers[0]
@@ -170,24 +172,31 @@ def get_center(request):
     else:
         return cors_Jsresponse({
             'code': 1,
-            'msg': 'There is no such discuss center'
+            'msg': 'There is no such discuss center.'
         })
 
 @csrf_exempt
 @require_GET
 def get_related_dis(request):
-    info = json.loads(request.body)
-    tag = info['tag']
-    dislist = []
-    for dis in Discussion.objects.all().order_by('-last.time'):
-        if tag in dis.tag_list:
-            udic = {}
-            udic['id'] = dis.id
-            udic['creator'] = dis.creator
-            udic['title'] = dis.title
-            udic['creatTime'] = dis.create_time
-            udic['replyNumber'] = dis.reply_number
-            dislist.append(udic)
-    return cors_Jsresponse({
-        'list': dislist
-    })
+    tag = request.GET['tag']
+    dis_centers = DisCenter.objects.filter(tag_title=tag)
+    if not dis_centers.exists():
+        return cors_Jsresponse({
+            'code': 105,
+            'msg': 'There is no such DisCenter.'
+        })
+    else:
+        center = DisCenter.objects.get(tag_title=tag)
+        dislist = []
+        for did in center.dis_list:
+            cur_dis = Discussion.objects.get(id=did)
+            dislist.append({
+                'id': did,
+                'creator': cur_dis.creator,
+                'title': cur_dis.title,
+                'creatTime': cur_dis.create_time,
+                'replyNumber': cur_dis.reply_number
+            })
+        return cors_Jsresponse({
+            'dislist': dislist
+        })

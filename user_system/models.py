@@ -55,9 +55,11 @@ class User(models.Model):
 
 class Papers(models.Model):
 
-    name            = models.CharField(max_length=128, db_index=True)
+    name            = models.CharField(max_length=128, unique=True, db_index=True)
+    pubyear         = models.CharField(max_length=10, default="unknown")
+    publisher       = models.JSONField(default=list)
     information     = models.TextField(default="Please edit by yourselves")
-    authors         = models.JSONField(default=list)
+    admins          = models.JSONField(default=list)
     file            = models.URLField(default='/media/file/LFS.pdf')
     tag_list        = models.JSONField(default=list)
     create_time     = models.DateField(auto_now_add=True)
@@ -85,10 +87,12 @@ class Discussion(models.Model):
     creator         = models.CharField(max_length=16, db_index=True)
     title           = models.CharField(max_length=128, db_index=True)
     tag_list        = models.JSONField(default=list)
+    paper_list      = models.JSONField(default=list)
     reply           = models.JSONField(default=list)
     reply_number    = models.IntegerField(default=0)
     create_time     = models.DateField(auto_now_add=True)
     last            = models.JSONField(default=dict)
+    last_time       = models.DateTimeField(auto_now=True)
 
     def add_tag(self, tag):
         if tag not in self.tag_list:
@@ -113,6 +117,6 @@ class Discussion(models.Model):
 
 class DisCenter(models.Model):
 
-    tag_title   = models.CharField(max_length=128, unique=True, db_index=True, default="")
+    tag_title   = models.CharField(max_length=128, unique=True, db_index=True)
     number      = models.IntegerField(default=0)
     dis_list    = models.JSONField(default=list)
