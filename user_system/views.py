@@ -91,6 +91,28 @@ def logout(request):
     })
 
 @csrf_exempt
+@require_cors_POST
+@check_login
+def set_password(request):
+    name = request.session['name']
+    info = json.loads(request.body)
+    old_password = info['oldPassword']
+    new_password = info['newPassword']
+    cur_user = User.objects.get(username=name)
+    if old_password == cur_user.password_hash:
+        cur_user.password_hash = new_password
+        cur_user.save()
+        return cors_Jsresponse({
+            'code': 0,
+            'msg': 'Change password successfully.'
+        })
+    else:
+        return cors_Jsresponse({
+            'code': 2,
+            'msg': 'Password is wrong.'
+        })
+
+@csrf_exempt
 @require_GET
 @check_login
 def get_my_information(request):
@@ -100,6 +122,7 @@ def get_my_information(request):
         'username': cur_user.username,
         'email': cur_user.email,
         'profile': cur_user.profile,
+        'public': cur_user.public,
         'follow': cur_user.like_users,
         'subscribe': cur_user.like_tags,
     })
@@ -108,7 +131,7 @@ def get_my_information(request):
 @require_GET
 def get_others_information(request):
     get_info = json.loads(request.body)
-    name = get_info['username']
+    name = request.GET['username']
     if not User.objects.filter(username=name).exists():
         return cors_Jsresponse({'code': 1, 'msg': 'The user does not exist'})
     else:
@@ -137,12 +160,12 @@ def set_my_information(request):
     name = request.session['name']
     set_info = json.loads(request.body)
     email = set_info['email']
-    password = set_info['password']
+#    password = set_info['password']
     profile = set_info['profile']
     public = set_info['public']
     cur_user = User.objects.get(username=name)
     cur_user.email = email
-    cur_user.password_hash = password
+#    cur_user.password_hash = password
     cur_user.profile = profile
     cur_user.public = public
     cur_user.save()
@@ -155,7 +178,7 @@ def set_my_information(request):
 @require_GET
 def get_history(request):
     get_info = json.loads(request.body)
-    name = get_info['username']
+    name = request.GET['username']
     if not User.objects.filter(username=name).exists():
         return cors_Jsresponse({'code': 1, 'msg': 'The user does not exist'})
     else:

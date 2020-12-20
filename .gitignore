@@ -1,3 +1,4 @@
 .vscode/
 venv/
 .pdf
+.sqlite3
