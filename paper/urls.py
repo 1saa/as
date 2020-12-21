@@ -7,4 +7,5 @@ urlpatterns = [
     path('add_tag', views.add_tag),
     path('del_tag', views.delete_tag),
     path('get_all', views.get_all_paper),
+    path('upload', views.upload_file),
 ]

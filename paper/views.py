@@ -5,6 +5,7 @@ from django.views.decorators.http import require_GET
 import json
 from user_system.models import User, Papers, Discussion, DisCenter
 from user_system.views import require_cors_POST, check_login, cors_Jsresponse
+import os
 
 @csrf_exempt
 @require_cors_POST
@@ -94,4 +95,37 @@ def get_all_paper(request):
     paper_lsit = Papers.objects.values('id', 'name')
     return cors_Jsresponse({
         'paperlist': list(paper_lsit)
+    })
+
+def get_hash(s):
+    mod = 1000000007
+    pro = 233
+    ret = 0
+    for char in s:
+        ret = (ret * pro + ord(char)) % mod
+    return str(ret)
+
+@csrf_exempt
+@require_cors_POST
+@check_login
+def upload_file(request):
+    name = request.session['name']
+    pid = request.POST.get('id')
+    cur_paper = Papers.objects.get(id=pid)
+    if name not in cur_paper.admins:
+        return cors_Jsresponse({
+            'code': 199,
+            'msg': 'You do not have the permission to modify.'
+        })
+    obj = request.FILES.get('paper_file')
+    file_path = os.path.join('file', get_hash(cur_paper.name)+".pdf")
+    f = open(file_path, mode="wb")
+    for i in obj.chunks():
+        f.write(i)
+    f.close()
+    cur_paper.file = file_path
+    cur_paper.save()
+    return cors_Jsresponse({
+        'code': 0,
+        'msg': 'Upload the file successfully.'
     })

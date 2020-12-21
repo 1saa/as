@@ -60,7 +60,7 @@ class Papers(models.Model):
     publisher       = models.JSONField(default=list)
     information     = models.TextField(default="Please edit by yourselves")
     admins          = models.JSONField(default=list)
-    file            = models.URLField(default='/media/file/LFS.pdf')
+    file            = models.URLField(default='file\\0.pdf')
     tag_list        = models.JSONField(default=list)
     create_time     = models.DateField(auto_now_add=True)
     last_name       = models.CharField(max_length=16, null=True)
