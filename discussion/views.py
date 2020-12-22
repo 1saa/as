@@ -200,3 +200,46 @@ def get_related_dis(request):
         return cors_Jsresponse({
             'dislist': dislist
         })
+
+@csrf_exempt
+@require_GET
+def get_active(request):
+    offset = int(request.GET['offset'])
+    dislist = Discussion.objects.order_by('-last_time')
+    ndis = dislist.count()
+    actlist = []
+    for i in range(10):
+        if offset + i >= ndis:
+            break
+        cur_dis = dislist[offset + i]
+        actlist.append({
+            'id': cur_dis.id,
+            'creator': cur_dis.creator,
+            'title': cur_dis.title,
+            'creatTime': cur_dis.create_time,
+            'replyNumber': cur_dis.reply_number,
+            'lastReply': cur_dis.last
+        })
+    return cors_Jsresponse({
+        'dislist': actlist
+    })
+
+@csrf_exempt
+@require_GET
+def get_hot(request):
+    dislist = Discussion.objects.order_by('-reply_number')
+    ndis = dislist.count()
+    hotlist = []
+    for i in range(min([5, ndis])):
+        cur_dis = dislist[i]
+        hotlist.append({
+            'id': cur_dis.id,
+            'creator': cur_dis.creator,
+            'title': cur_dis.title,
+            'creatTime': cur_dis.create_time,
+            'replyNumber': cur_dis.reply_number,
+            'lastReply': cur_dis.last
+        })
+    return cors_Jsresponse({
+        'dislist': hotlist
+    })

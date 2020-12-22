@@ -11,4 +11,6 @@ urlpatterns = [
     path('create_center', views.create_center),
     path('get_center', views.get_center),
     path('get_related', views.get_related_dis),
+    path('get_active', views.get_active),
+    path('get_hot', views.get_hot),
 ]
