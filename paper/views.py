@@ -17,6 +17,13 @@ def create_paper(request):
     paper_puby = info['year']
     paper_pubr = info['author']
     paper_info = info['information']
+    if Papers.objects.filter(name=paper_name).exists():
+        cur_paper = Papers.objects.get(name=paper_name)
+        return cors_Jsresponse({
+            'code': 1,
+            'msg': 'The paper has been created.',
+            'id': cur_paper.id
+        })
     new_paper = Papers()
     new_paper.name = paper_name
     new_paper.pubyear = paper_puby
@@ -68,9 +75,10 @@ def set_info(request):
 @check_login
 def add_tag(request):
     add_info = json.loads(request.body)
-    tag = add_info['tag']
+    taglist = add_info['tag']
     cur_paper = Papers.objects.get(id=add_info['id'])
-    cur_paper.add_tag(tag)
+    for tag in taglist:
+        cur_paper.add_tag(tag)
     return cors_Jsresponse({
         'code': 0,
         'msg': 'set successfully'
