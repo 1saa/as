@@ -1,4 +1,6 @@
 .vscode/
 venv/
+*/__pycache__
 *.pdf
 *.sqlite3
+*.pyc
