@@ -11,7 +11,6 @@ from user_system.views import check_login
 #return: JSON: fail--{'ret':1,'msg':'msg'},suscess--{'ret': 0,'retlist': retlist}
 #search_discussion url: data/search/discussion/?tag=*&up=*(true/false)
 #return: JSON: fail--{'ret':1,'msg':'msg'},suscess--{'ret': 0,'retlist': retlist}
-
 @csrf_exempt
 @require_http_methods(['GET','OPTIONS'])
 @check_login
@@ -30,14 +29,14 @@ def search_papers(request):
             paperset = paperset.filter(name=na)
         if au:
             paperset = paperset.filter(authors__name=au)
-         if ta:
+        if ta:
             for q in paperset:
-                count = 0
+                count  = 0
                 for p in q.tag_list:
-                    if (p == ta):
+                    if(p == ta):
                         count += 1
                         break
-                if (count == 0):
+                if(count == 0):
                     paperset = paperset.remove(q)
         if paperset.exists():
             if up:
@@ -50,6 +49,26 @@ def search_papers(request):
             return response
         else:
             response = JsonResponse({'ret': 1, 'msg': '找不到此类型论文'})
+            response['Access-Control-Allow-Origin'] = 'http://localhost:3000'
+            return response
+@csrf_exempt
+@require_http_methods(['GET','OPTIONS'])
+@check_login
+def search_new_papers(request):
+    if (request.method == 'OPTIONS'):
+        response_options()
+    if request.method != 'GET':
+        return JsonResponse({'ret':1,'msg':'不支持此类型的http请求'})
+    else:
+        paperset = Papers.objects.values()
+        if paperset.exists():
+            paperset = paperset.order_by('-create_time')
+            retlist = list(paperset)
+            response = JsonResponse({'ret': 0,'retlist': retlist})
+            response['Access-Control-Allow-Origin'] = 'http://localhost:3000'
+            return response
+        else:
+            response = JsonResponse({'ret': 1, 'msg': '论文库为空'})
             response['Access-Control-Allow-Origin'] = 'http://localhost:3000'
             return response
 
@@ -65,7 +84,7 @@ def search_discussions(request):
         discussionset = Discussion.objects.values()
         ta = request.GET.get('tag', None)
         up = request.GET.get('up', None)
-         if ta:
+        if ta:
             for q in discussionset:
                 count = 0
                 for p in q.tag_list:
@@ -87,10 +106,50 @@ def search_discussions(request):
             response =  JsonResponse({'ret': 1, 'msg': '找不到此类型讨论'})
             response['Access-Control-Allow-Origin'] = 'http://localhost:3000'
             return response
+@csrf_exempt
+@require_http_methods(['GET','OPTIONS'])
+@check_login
+def search_hot_discussions(request):
+    if (request.method == 'OPTIONS'):
+        response_options()
+    if request.method != 'GET':
+        return JsonResponse({'ret':1,'msg':'不支持此类型的http请求'})
+    else:
+        discussionset = Discussion.objects.values()
+        if discussionset.exists():
+            discussionset = discussionset.order_by('-reply_number')
+            retlist = list(discussionset)
+            response =  JsonResponse({'ret': 0, 'retlist': retlist})
+            response['Access-Control-Allow-Origin'] = 'http://localhost:3000'
+            return response
+        else:
+            response =  JsonResponse({'ret': 1, 'msg': '找不到此类型讨论'})
+            response['Access-Control-Allow-Origin'] = 'http://localhost:3000'
+            return response
 
+@csrf_exempt
+@require_http_methods(['GET', 'OPTIONS'])
+@check_login
+def search_new_discussions(request):
+    if (request.method == 'OPTIONS'):
+        response_options()
+    if request.method != 'GET':
+        return JsonResponse({'ret': 1, 'msg': '不支持此类型的http请求'})
+    else:
+        discussionset = Discussion.objects.values()
+        if discussionset.exists():
+            discussionset = discussionset.order_by('-last_time')
+            retlist = list(discussionset)
+            response = JsonResponse({'ret': 0, 'retlist': retlist})
+            response['Access-Control-Allow-Origin'] = 'http://localhost:3000'
+            return response
+        else:
+            response = JsonResponse({'ret': 1, 'msg': '找不到此类型讨论'})
+            response['Access-Control-Allow-Origin'] = 'http://localhost:3000'
+            return response
 def response_options():
   response = HttpResponse()
   response['Access-Control-Allow-Origin'] = 'http://localhost:3000'
   response['Access-Control-Allow-Methods'] = 'POST'
   response['Access-Control-Allow-Headers'] = 'Content-Type'
-  return response
+  return resp
