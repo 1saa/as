@@ -30,8 +30,15 @@ def search_papers(request):
             paperset = paperset.filter(name=na)
         if au:
             paperset = paperset.filter(authors__name=au)
-        if ta:
-            paperset = paperset.filter(tag_list=ta)
+         if ta:
+            for q in paperset:
+                count = 0
+                for p in q.tag_list:
+                    if (p == ta):
+                        count += 1
+                        break
+                if (count == 0):
+                    paperset = paperset.remove(q)
         if paperset.exists():
             if up:
                 paperset = paperset.order_by('create_time')
@@ -58,8 +65,15 @@ def search_discussions(request):
         discussionset = Discussion.objects.values()
         ta = request.GET.get('tag', None)
         up = request.GET.get('up', None)
-        if ta:
-            discussionset = discussionset.filter(tag_list=ta)
+         if ta:
+            for q in discussionset:
+                count = 0
+                for p in q.tag_list:
+                    if (p == ta):
+                        count += 1
+                        break
+                if (count == 0):
+                    paperset = paperset.remove(q)
         if discussionset.exists():
             if up:
                 discussionset = discussionset.order_by('reply_number')
