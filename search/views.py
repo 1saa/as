@@ -152,4 +152,4 @@ def response_options():
   response['Access-Control-Allow-Origin'] = 'http://localhost:3000'
   response['Access-Control-Allow-Methods'] = 'POST'
   response['Access-Control-Allow-Headers'] = 'Content-Type'
-  return resp
+  return response
