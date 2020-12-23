@@ -198,6 +198,7 @@ def get_related_dis(request):
                 'replyNumber': cur_dis.reply_number
             })
         return cors_Jsresponse({
+            'ndis': len(dislist),
             'dislist': dislist
         })
 
@@ -221,13 +222,14 @@ def get_active(request):
             'lastReply': cur_dis.last
         })
     return cors_Jsresponse({
+        'ndis': ndis,
         'dislist': actlist
     })
 
 @csrf_exempt
 @require_GET
 def get_hot(request):
-    dislist = Discussion.objects.order_by('-reply_number')
+    dislist = Discussion.objects.order_by('-reply_number', '-last_time')
     ndis = dislist.count()
     hotlist = []
     for i in range(min([5, ndis])):
@@ -241,5 +243,6 @@ def get_hot(request):
             'lastReply': cur_dis.last
         })
     return cors_Jsresponse({
+        'ndis': ndis,
         'dislist': hotlist
     })

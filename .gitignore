@@ -1,4 +1,4 @@
 .vscode/
 venv/
-.pdf
-.sqlite3
+*.pdf
+*.sqlite3

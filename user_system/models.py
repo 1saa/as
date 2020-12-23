@@ -7,7 +7,7 @@ class User(models.Model):
     
     username        = models.CharField(max_length=16, unique=True, db_index=True)
     email           = models.EmailField(null=True)
-    password_hash   = models.CharField(max_length=16)
+    password_hash   = models.CharField(max_length=32)
     profile         = models.TextField(default="not edit yet")
     like_users      = models.JSONField(default=list)
     like_tags       = models.JSONField(default=list)
@@ -92,7 +92,7 @@ class Discussion(models.Model):
     reply_number    = models.IntegerField(default=0)
     create_time     = models.DateField(auto_now_add=True)
     last            = models.JSONField(default=dict)
-    last_time       = models.DateTimeField(auto_now=True)
+    last_time       = models.DateTimeField(null=True)
 
     def add_tag(self, tag):
         if tag not in self.tag_list:
@@ -113,6 +113,7 @@ class Discussion(models.Model):
         self.last['reconumb'] = 0
         self.last['recolist'] = [] 
         self.reply.append(self.last)
+        self.last_time = self.last['time']
         self.save()
 
 class DisCenter(models.Model):
