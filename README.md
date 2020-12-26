@@ -10,7 +10,7 @@ python --version
 
 pip install virtualenv
 
-virtualenv venv
+python -m virtualenv venv
 
 cd venv\Scripts
 
@@ -27,6 +27,12 @@ python manage.py migrate
 在models中使用了JOSNField
 
 若出现错误，参考网站：https://stackoverflow.com/questions/62637458/django-3-1-fields-e180-sqlite-does-not-support-jsonfields
+
+可以通过
+
+python manage.py createsuperuser
+
+创建管理员用户，访问http://127.0.0.1:8000/admin/直接修改后台数据
 
 之后通过使用
 

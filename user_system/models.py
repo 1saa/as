@@ -113,7 +113,7 @@ class Discussion(models.Model):
         self.last['reconumb'] = 0
         self.last['recolist'] = [] 
         self.reply.append(self.last)
-        self.last_time = self.last['time']
+        self.last_time = timezone.now()
         self.save()
 
 class DisCenter(models.Model):
