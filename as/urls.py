@@ -23,4 +23,5 @@ urlpatterns = [
     path('discussion/', include('discussion.urls')),
     path('paper/', include('paper.urls')),
     path('admin/', admin.site.urls),
+    path('search/', include('search.urls')),
 ] + static('/file/', document_root=settings.MEDIA_ROOT)
