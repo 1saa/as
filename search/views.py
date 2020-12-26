@@ -21,10 +21,9 @@ def search_papers(request):
         return JsonResponse({'ret':1,'msg':'不支持此类型的http请求'})
     else:
         paperset = Papers.objects.values()
-        na = request.GET.get('name', None)
-        au = request.GET.get('authors', None)
-        ta = request.GET.get('tag', None)
-        up = request.GET.get('up', None)
+        na = request.GET.get('Keywords', None)
+        au = request.GET.get('Authors', None)
+        ta = request.GET.get('Tags', None)
         if na:
             paperset = paperset.filter(name=na)
         if au:
@@ -39,10 +38,7 @@ def search_papers(request):
                 if(count == 0):
                     paperset = paperset.remove(q)
         if paperset.exists():
-            if up:
-                paperset = paperset.order_by('create_time')
-            else:
-                paperset = paperset.order_by('-create_time')
+            paperset = paperset.order_by('-create_time')
             retlist = list(paperset)
             response = JsonResponse({'ret': 0,'retlist': retlist})
             response['Access-Control-Allow-Origin'] = 'http://localhost:3000'
