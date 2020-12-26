@@ -8,7 +8,7 @@ from django.views.decorators.http import require_GET, require_http_methods
 from user_system.views import check_login
 from functools import wraps
 # Create your views here.
-#search_papers url: data/search/papers/?name=*&authors=*&tag=*&up=*
+#search_papers url: search/?Type=paper|discussion&Keywords =&KeywordsEntire =&KeywordsAvoid=&KeywordsAvoidEntire =&Authors =&Tags =
 #return: JSON: fail--{'ret':1,'msg':'msg'},suscess--{'ret': 0,'retlist': retlist}
 #search_discussion url: data/search/discussion/?tag=*&up=*(true/false)
 #return: JSON: fail--{'ret':1,'msg':'msg'},suscess--{'ret': 0,'retlist': retlist}
@@ -120,10 +120,10 @@ def getall(request):
         to_be_deleted2 = []
         if ta:
             for paper in paperset:
-                if(ta not in paper.tag_list):
+                if ta not in paper.tag_list:
                     to_be_deleted.append(paper.id)
             for dis in discussionset:
-                if (ta not in dis.tag_list):
+                if ta not in dis.tag_list:
                     to_be_deleted2.append(dis.id)
         paperset = paperset.filter(id__in = to_be_deleted).delete()
         discussionset = discussionset.filter(id__in=to_be_deleted2).delete()
@@ -165,6 +165,7 @@ def getall(request):
         response = JsonResponse(retlist,safe=False)
         response['Access-Control-Allow-Origin'] = 'http://localhost:3000'
         return response
+
 @csrf_exempt
 @require_cors_GET
 @check_login
@@ -195,7 +196,7 @@ def search_papers(request):
         to_be_deleted = []
         if ta:
             for paper in paperset:
-                if(ta not in paper.tag_list):
+                if ta not in paper.tag_list:
                     to_be_deleted.append(paper.id)
         paperset = paperset.filter(id__in = to_be_deleted).delete()
         retlist = []
@@ -271,7 +272,7 @@ def search_discussions(request):
         retlist = []
         if ta:
             for dis in discussionset:
-                if (ta not in dis.tag_list):
+                if ta not in dis.tag_list:
                     to_be_deleted.append(dis.id)
         discussionset = discussionset.filter(id__in=to_be_deleted).delete()
         if (discussionset.exists()):
