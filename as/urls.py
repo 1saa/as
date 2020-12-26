@@ -17,11 +17,12 @@ from django.contrib import admin
 from django.urls import include, path
 from django.conf.urls.static import static
 from django.conf import settings
+from search.views import search_results
 
 urlpatterns = [
     path('user_system/', include('user_system.urls')),
     path('discussion/', include('discussion.urls')),
     path('paper/', include('paper.urls')),
     path('admin/', admin.site.urls),
-    path('search/', include('search.urls')),
+    path('search/', search_results),
 ] + static('/file/', document_root=settings.MEDIA_ROOT)
