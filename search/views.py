@@ -64,7 +64,7 @@ def cors_Jsresponse(ret):
     return add_cors_header(JsonResponse(ret))
 @csrf_exempt
 @require_cors_GET
-@check_login
+#@check_login
 def search_results(request):
     if (request.method == 'OPTIONS'):
         response_options()
@@ -85,7 +85,7 @@ def search_results(request):
 
 @csrf_exempt
 @require_cors_GET
-@check_login
+#@check_login
 def getall(request):
     if (request.method == 'OPTIONS'):
         response_options()
@@ -120,11 +120,11 @@ def getall(request):
         to_be_deleted2 = []
         if ta:
             for paper in paperset:
-                if ta not in paper.tag_list:
-                    to_be_deleted.append(paper.id)
+                if ta not in paper["tag_list"]:
+                    to_be_deleted.append(paper["id"])
             for dis in discussionset:
-                if ta not in dis.tag_list:
-                    to_be_deleted2.append(dis.id)
+                if ta not in dis["tag_list"]:
+                    to_be_deleted2.append(dis["id"])
         paperset = paperset.filter(id__in = to_be_deleted).delete()
         discussionset = discussionset.filter(id__in=to_be_deleted2).delete()
         retlist = []
@@ -135,14 +135,14 @@ def getall(request):
                 retlist = retlist.qppend(
                     {
                     'key': count,
-                    'id': paper.id,
+                    'id': paper["id"],
                     'type': 'paper',
-                    'title': paper.name,
-                    'abstract':paper.infomation,
-                    'tags': paper.tag_list,
-                    'authors': paper.publisher,
-                    'publishtime':paper.pubyear,
-                    'updatetime':paper.last_time,
+                    'title': paper["name"],
+                    'abstract':paper["infomation"],
+                    'tags': paper["tag_list"],
+                    'authors': paper["publisher"],
+                    'publishtime':paper["pubyear"],
+                    'updatetime':paper["last_time"],
                     }
                 )
         if (discussionset.exists()):
@@ -152,14 +152,14 @@ def getall(request):
                 retlist = retlist.qppend(
                     {
                         'key': count,
-                        'id': dis_2.id,
+                        'id': dis_2["id"],
                         'type': 'discussion',
-                        'title': dis_2.title,
+                        'title': dis_2["title"],
                         'abstract': '',
-                        'tags': dis_2.tag_list,
-                        'authors': dis_2.creator,
-                        'publishtime': dis_2.creat_time,
-                        'updatetime': dis_2.last_time,
+                        'tags': dis_2["tag_list"],
+                        'authors': dis_2["creator"],
+                        'publishtime': dis_2["creat_time"],
+                        'updatetime': dis_2["last_time"],
                     }
                 )
         response = JsonResponse(retlist,safe=False)
@@ -168,7 +168,7 @@ def getall(request):
 
 @csrf_exempt
 @require_cors_GET
-@check_login
+#@check_login
 def search_papers(request):
     if (request.method == 'OPTIONS'):
         response_options()
@@ -196,8 +196,8 @@ def search_papers(request):
         to_be_deleted = []
         if ta:
             for paper in paperset:
-                if ta not in paper.tag_list:
-                    to_be_deleted.append(paper.id)
+                if ta not in paper["tag_list"]:
+                    to_be_deleted.append(paper["id"])
         paperset = paperset.filter(id__in = to_be_deleted).delete()
         retlist = []
         if(paperset.exists()):
@@ -206,15 +206,15 @@ def search_papers(request):
                 count = count + 1
                 retlist = retlist.qppend(
                     {
-                    'key': count,
-                    'id': paper.id,
-                    'type': 'paper',
-                    'title': paper.name,
-                    'abstract':paper.infomation,
-                    'tags': paper.tag_list,
-                    'authors': paper.publisher,
-                    'publishtime':paper.pubyear,
-                    'updatetime':paper.last_time,
+                        'key': count,
+                        'id': paper["id"],
+                        'type': 'paper',
+                        'title': paper["name"],
+                        'abstract': paper["infomation"],
+                        'tags': paper["tag_list"],
+                        'authors': paper["publisher"],
+                        'publishtime': paper["pubyear"],
+                        'updatetime': paper["last_time"],
                     }
                 )
         response = JsonResponse(retlist,safe=False)
@@ -243,7 +243,7 @@ def search_new_papers(request):
 
 @csrf_exempt
 @require_cors_GET
-@check_login
+#@check_login
 def search_discussions(request):
     if (request.method == 'OPTIONS'):
         response_options()
@@ -272,8 +272,8 @@ def search_discussions(request):
         retlist = []
         if ta:
             for dis in discussionset:
-                if ta not in dis.tag_list:
-                    to_be_deleted.append(dis.id)
+                if ta not in dis["tag_list"]:
+                    to_be_deleted.append(dis["id"])
         discussionset = discussionset.filter(id__in=to_be_deleted).delete()
         if (discussionset.exists()):
             discussionset = discussionset.order_by('-create_time')
@@ -282,14 +282,14 @@ def search_discussions(request):
                 retlist = retlist.qppend(
                     {
                         'key': count,
-                        'id': dis_2.id,
+                        'id': dis_2["id"],
                         'type': 'discussion',
-                        'title': dis_2.title,
+                        'title': dis_2["title"],
                         'abstract': '',
-                        'tags': dis_2.tag_list,
-                        'authors': dis_2.creator,
-                        'publishtime': dis_2.creat_time,
-                        'updatetime': dis_2.last_time,
+                        'tags': dis_2["tag_list"],
+                        'authors': dis_2["creator"],
+                        'publishtime': dis_2["creat_time"],
+                        'updatetime': dis_2["last_time"],
                     }
                 )
         response = JsonResponse(retlist, safe=False)
