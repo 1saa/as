@@ -27,7 +27,7 @@ def search_papers(request):
         if na:
             paperset = paperset.filter(name=na)
         if au:
-            paperset = paperset.filter(authors__name=au)
+            paperset = paperset.filter(publisher__name=au)
         if ta:
             for q in paperset:
                 count  = 0
