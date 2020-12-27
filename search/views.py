@@ -36,6 +36,7 @@ from functools import wraps
 #}
 def response_options():
     response = HttpResponse()
+    response['Access-Control-Allow-Origin'] = 'http://localhost:3000'
     response['Access-Control-Allow-Methods'] = 'GET'
     response['Access-Control-Allow-Credentials'] = 'true'
     response['Access-Control-Allow-Headers'] = 'Content-Type'
@@ -61,6 +62,7 @@ def require_cors_GET(func):
 
 def cors_Jsresponse(*args, **kwargs):
     return add_cors_header(JsonResponse(*args, **kwargs))
+    
 @csrf_exempt
 @require_cors_GET
 #@check_login
@@ -210,11 +212,9 @@ def search_new_papers(request):
         paperset = paperset.order_by('-create_time')
         retlist = list(paperset)
         response = cors_Jsresponse({'ret': 0,'retlist': retlist})
-        response['Access-Control-Allow-Origin'] = 'http://localhost:3000'
         return response
     else:
         response = cors_Jsresponse({'ret': 1, 'msg': '论文库为空'})
-        response['Access-Control-Allow-Origin'] = 'http://localhost:3000'
         return response
 
 @csrf_exempt
@@ -274,11 +274,9 @@ def search_hot_discussions(request):
         discussionset = discussionset.order_by('-reply_number')
         retlist = list(discussionset)
         response =  cors_Jsresponse({'ret': 0, 'retlist': retlist})
-        response['Access-Control-Allow-Origin'] = 'http://localhost:3000'
         return response
     else:
         response =  cors_Jsresponse({'ret': 1, 'msg': '找不到此类型讨论'})
-        response['Access-Control-Allow-Origin'] = 'http://localhost:3000'
         return response
 
 @csrf_exempt
@@ -290,9 +288,7 @@ def search_new_discussions(request):
         discussionset = discussionset.order_by('-last_time')
         retlist = list(discussionset)
         response = cors_Jsresponse({'ret': 0, 'retlist': retlist})
-        response['Access-Control-Allow-Origin'] = 'http://localhost:3000'
         return response
     else:
         response = cors_Jsresponse({'ret': 1, 'msg': '找不到此类型讨论'})
-        response['Access-Control-Allow-Origin'] = 'http://localhost:3000'
         return response
