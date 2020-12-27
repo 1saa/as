@@ -36,6 +36,7 @@ from functools import wraps
 #}
 def response_options():
     response = HttpResponse()
+    response['Access-Control-Allow-Origin'] = 'http://localhost:3000'
     response['Access-Control-Allow-Methods'] = 'GET'
     response['Access-Control-Allow-Credentials'] = 'true'
     response['Access-Control-Allow-Headers'] = 'Content-Type'
@@ -59,8 +60,8 @@ def require_cors_GET(func):
     return inner
 
 
-def cors_Jsresponse(*args, **kwargs):
-    return add_cors_header(JsonResponse(*args, **kwargs))
+def cors_Jsresponse(ret):
+    return add_cors_header(JsonResponse(ret))
 @csrf_exempt
 @require_cors_GET
 #@check_login
@@ -82,6 +83,7 @@ def search_results(request):
 def getall(request):
     paperset = Papers.objects.values()
     discussionset = Discussion.objects.values()
+
     na = request.GET.get('Keywords', None)
     na2 = request.GET.get('KeywordsEntire', None)
     na3 = request.GET.get('KeywordsAvoid', None)
@@ -89,17 +91,17 @@ def getall(request):
     au = request.GET.get('Authors', None)
     ta = request.GET.get('Tags', None)
     if na:
-        paperset = paperset.filter(name=na)
-        discussionset = discussionset.filter(name=na)
+        paperset = paperset.filter(name__contains=na)
+        discussionset = discussionset.filter(title__contains=na)
     if na2:
-        paperset = paperset.filter(name=na)
-        discussionset = discussionset.filter(name=na)
+        paperset = paperset.filter(name__contains=na)
+        discussionset = discussionset.filter(title__contains=na)
     if na3:
-        paperset = paperset.filter(name=na)
-        discussionset = discussionset.filter(name=na)
+        paperset = paperset.filter(name__contains=na)
+        discussionset = discussionset.filter(title__contains=na)
     if na4:
-        paperset = paperset.filter(name=na)
-        discussionset = discussionset.filter(name=na)
+        paperset = paperset.filter(name__contains=na)
+        discussionset = discussionset.filter(title__contains=na)
     if au:
         paperset = paperset.filter(publisher__name=au)
         discussionset = discussionset.filter(creator=au)
@@ -120,7 +122,7 @@ def getall(request):
         paperset = paperset.order_by('-create_time')
         for paper in paperset:
             count = count + 1
-            retlist.append(
+            retlist = retlist.append(
                 {
                 'key': count,
                 'id': paper["id"],
@@ -137,7 +139,7 @@ def getall(request):
         discussionset = discussionset.order_by('-create_time')
         for dis_2 in discussionset:
             count = count + 1
-            retlist.append(
+            retlist = retlist.append(
                 {
                     'key': count,
                     'id': dis_2["id"],
@@ -146,11 +148,12 @@ def getall(request):
                     'abstract': '',
                     'tags': dis_2["tag_list"],
                     'authors': dis_2["creator"],
-                    'publishtime': dis_2["create_time"],
+                    'publishtime': dis_2["creat_time"],
                     'updatetime': dis_2["last_time"],
                 }
             )
-    response = cors_Jsresponse(retlist,safe=False)
+    response = JsonResponse(retlist,safe=False)
+    response['Access-Control-Allow-Origin'] = 'http://localhost:3000'
     return response
 
 @csrf_exempt
@@ -165,13 +168,13 @@ def search_papers(request):
     au = request.GET.get('Authors', None)
     ta = request.GET.get('Tags', None)
     if na:
-        paperset = paperset.filter(name=na)
+        paperset = paperset.filter(name__contains=na)
     if na2:
-        paperset = paperset.filter(name=na)
+        paperset = paperset.filter(name__contains=na)
     if na3:
-        paperset = paperset.filter(name=na)
+        paperset = paperset.filter(name__contains=na)
     if na4:
-        paperset = paperset.filter(name=na)
+        paperset = paperset.filter(name__contains=na)
     if au:
         paperset = paperset.filter(publisher__name=au)
     count = 0
@@ -199,7 +202,8 @@ def search_papers(request):
                     'updatetime': paper["last_time"],
                 }
             )
-    response = cors_Jsresponse(retlist,safe=False)
+    response = JsonResponse(retlist,safe=False)
+    response['Access-Control-Allow-Origin'] = 'http://localhost:3000'
     return response
 @csrf_exempt
 @require_cors_GET
@@ -209,11 +213,11 @@ def search_new_papers(request):
     if paperset.exists():
         paperset = paperset.order_by('-create_time')
         retlist = list(paperset)
-        response = cors_Jsresponse({'ret': 0,'retlist': retlist})
+        response = JsonResponse({'ret': 0,'retlist': retlist})
         response['Access-Control-Allow-Origin'] = 'http://localhost:3000'
         return response
     else:
-        response = cors_Jsresponse({'ret': 1, 'msg': '论文库为空'})
+        response = JsonResponse({'ret': 1, 'msg': '论文库为空'})
         response['Access-Control-Allow-Origin'] = 'http://localhost:3000'
         return response
 
@@ -229,13 +233,13 @@ def search_discussions(request):
     au = request.GET.get('Authors', None)
     ta = request.GET.get('Tags', None)
     if na:
-        discussionset = discussionset.filter(name=na)
+        discussionset = discussionset.filter(title__contains=na)
     if na2:
-        discussionset = discussionset.filter(name=na)
+        discussionset = discussionset.filter(title__contains=na)
     if na3:
-        discussionset = discussionset.filter(name=na)
+        discussionset = discussionset.filter(title__contains=na)
     if na4:
-        discussionset = discussionset.filter(name=na)
+        discussionset = discussionset.filter(title__contains=na)
     if au:
         discussionset = discussionset.filter(creator=au)
     count = 0
@@ -259,11 +263,12 @@ def search_discussions(request):
                     'abstract': '',
                     'tags': dis_2["tag_list"],
                     'authors': dis_2["creator"],
-                    'publishtime': dis_2["create_time"],
+                    'publishtime': dis_2["creat_time"],
                     'updatetime': dis_2["last_time"],
                 }
             )
-    response = cors_Jsresponse(retlist, safe=False)
+    response = JsonResponse(retlist, safe=False)
+    response['Access-Control-Allow-Origin'] = 'http://localhost:3000'
     return response
 @csrf_exempt
 @require_cors_GET
@@ -273,11 +278,11 @@ def search_hot_discussions(request):
     if discussionset.exists():
         discussionset = discussionset.order_by('-reply_number')
         retlist = list(discussionset)
-        response =  cors_Jsresponse({'ret': 0, 'retlist': retlist})
+        response =  JsonResponse({'ret': 0, 'retlist': retlist})
         response['Access-Control-Allow-Origin'] = 'http://localhost:3000'
         return response
     else:
-        response =  cors_Jsresponse({'ret': 1, 'msg': '找不到此类型讨论'})
+        response =  JsonResponse({'ret': 1, 'msg': '找不到此类型讨论'})
         response['Access-Control-Allow-Origin'] = 'http://localhost:3000'
         return response
 
@@ -289,10 +294,10 @@ def search_new_discussions(request):
     if discussionset.exists():
         discussionset = discussionset.order_by('-last_time')
         retlist = list(discussionset)
-        response = cors_Jsresponse({'ret': 0, 'retlist': retlist})
+        response = JsonResponse({'ret': 0, 'retlist': retlist})
         response['Access-Control-Allow-Origin'] = 'http://localhost:3000'
         return response
     else:
-        response = cors_Jsresponse({'ret': 1, 'msg': '找不到此类型讨论'})
+        response = JsonResponse({'ret': 1, 'msg': '找不到此类型讨论'})
         response['Access-Control-Allow-Origin'] = 'http://localhost:3000'
         return response
