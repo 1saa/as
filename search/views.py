@@ -126,7 +126,7 @@ def getall(request):
                 'id': paper["id"],
                 'type': 'paper',
                 'title': paper["name"],
-                'abstract':paper["infomation"],
+                'abstract':paper["information"],
                 'tags': paper["tag_list"],
                 'authors': paper["publisher"],
                 'publishtime':paper["pubyear"],
