@@ -195,8 +195,10 @@ def get_related_dis(request):
                 'creator': cur_dis.creator,
                 'title': cur_dis.title,
                 'creatTime': cur_dis.create_time,
-                'replyNumber': cur_dis.reply_number
+                'replyNumber': cur_dis.reply_number,
+                'lastTime': cur_dis.last_time
             })
+        dislist.sort(key=lambda x: x['lastTime'])
         return cors_Jsresponse({
             'ndis': len(dislist),
             'dislist': dislist
