@@ -188,7 +188,7 @@ def search_papers(request):
         paperset = paperset.order_by('-create_time')
         for paper in paperset:
             count = count + 1
-            retlist = retlist.append(
+            retlist.append(
                 {
                     'key': count,
                     'id': paper["id"],
@@ -250,7 +250,7 @@ def search_discussions(request):
         discussionset = discussionset.order_by('-create_time')
         for dis_2 in discussionset:
             count = count + 1
-            retlist = retlist.append(
+            retlist.append(
                 {
                     'key': count,
                     'id': dis_2["id"],
